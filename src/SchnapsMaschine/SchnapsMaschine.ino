@@ -157,6 +157,7 @@ void loop()
         Serial.println(F("Schnapsmaschine bereit. Bitte Taste druecken!"));
 
         /* FALLTHROUGH */
+        phase = 1;
       case 1: //betriebsphase
         if(Taste == '1')
         {
@@ -222,6 +223,7 @@ void loop()
   }
 }
 
+//  5 , 4 , 3 , 2 , 1
 //                0 <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 
 int schritte[6] = { 1170, 1170, 1170, 1170, 1170 };
 
@@ -230,35 +232,7 @@ int fahre_zu_position(int aktuell,int ziel)
     
    Serial.println(F("Reset, Springe zu Phase 1."));
 
-   while(aktuell != ziel)
-   {
-      if(aktuell < ziel)
-      {
-         //nach rechts fahren z.B. von 2 (Mitte) nach 3 (rechts)
-          Serial.println(F("Schrittmotor nach rechts."));
-          if(aktuell >= 5) //Position 5 - Endposition
-          {
-             Serial.println(F("Nach rechts nicht mehr möglich"));
-             return -1;
-          }
-          motor(LOW,schritte[aktuell]); //1170 viertelUmderhung,2340 Halbe Umdrehung 
-          aktuell = aktuell + 1;
-
-      }
-      else {
-        //nach links fahren von 2 nach 1
-        Serial.println(F("Schrittmotor nach links."));
-        if(aktuell <= 0) //position 0 - Endposition
-        {
-           Serial.println(F("Nach links nicht mehr möglich"));
-           return -1;
-        }
-        motor(LOW,schritte[aktuell-1]); //1170 viertelUmderhung,2340 Halbe Umdrehung 
-        aktuell = aktuell - 1;
-      }
-      
-    
-   }
+  
 
 
    return ziel;
@@ -271,7 +245,6 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
 {
     /*
      * Glas prüfen
-     * 
      */
     int glas_erkannt = teste_glas();
     if(glas != glas_erkannt)
@@ -302,7 +275,7 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
     }
     
   
-
+    myDFPlayer.play(12);  //Play MP3
     /*
      * Position anfahren
      */
@@ -328,8 +301,14 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
       */
     
     aktuell = fahre_zu_position(aktuell,start);
+    if(aktuell < 0)
+    {
+       myDFPlayer.play(30);  //Play MP3
+       return;
+    }
+     
+    myDFPlayer.play(13);  //Play MP3
 
-  
 }
 
 
@@ -341,7 +320,7 @@ int teste_glas()
   boolean oben = digitalRead(IR_SENSOR_OBEN);
   boolean unten = digitalRead(IR_SENSOR_UNTEN);
 
-  if(oben == LOW && unten == LOW)
+  if(oben == LOW)
   {
      return GLAS_GROSS;
   }
@@ -358,7 +337,7 @@ void motor(int richtung, int steps)
 {
 
   digitalWrite (dir, richtung); // richtung LOW = vorwaerts/links , HIGH = rueckwaerts/rechts
-  for (int x = 0; x <1170; x ++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
+  for (int x = 0; x <steps; x ++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
     delayMicroseconds(1500); // WARTEN

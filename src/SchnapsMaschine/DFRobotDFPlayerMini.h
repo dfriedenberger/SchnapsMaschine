@@ -14,7 +14,7 @@
 #include "Arduino.h"
 
 #ifndef DFRobotDFPlayerMini_cpp
-    #define DFRobotDFPlayerMini_cpp
+#define DFRobotDFPlayerMini_cpp
 
 
 #define DFPLAYER_EQ_NORMAL 0
