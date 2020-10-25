@@ -1,4 +1,4 @@
-/***************************************************
+  /***************************************************
   Schnapsmaschine
   Entwickelt von Wolfgang
     mit Unterstuetzung bei der Softwareentwicklung von Dirk
@@ -32,7 +32,7 @@ void printDetail(uint8_t type, int value);
 //-------------- Tastenfeld --------------
 //Groesse des Keypads 
 const byte COLS = 3; //3 Spalten
-const byte ROWS = 4; //4 Zeilen
+const byte ROWS = 4; //4 Zeilen   
 //Die Ziffern/Zeichen:
 char hexaKeys[ROWS][COLS]={
   {'#','0','*'},
@@ -41,8 +41,8 @@ char hexaKeys[ROWS][COLS]={
   {'3','2','1'}
 };
 
-byte colPins[COLS] = { 34, 36, 38 }; //Definition der Pins für die 3 Spalten
-byte rowPins[ROWS] = { 40, 42, 44, 46 };//Definition der Pins für die 4 Zeilen
+byte colPins[COLS] = { 38, 40, 42 }; //Definition der Pins für die 3 Spalten
+byte rowPins[ROWS] = { 44, 46, 48, 50 };//Definition der Pins für die 4 Zeilen
 char Taste = 0; //pressedKey entspricht in Zukunft den gedrückten Tasten
 Keypad Tastenfeld = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
@@ -58,10 +58,25 @@ const int RELAIS1 = 22; //Arduino Pin 22
 const int RELAIS2 = 24; //Arduino Pin 24
 const int RELAIS3 = 26; //Arduino Pin 26
 const int RELAIS4 = 28; //Arduino Pin 28
-const int RELAIS5 = 23; //Arduino Pin 30
-const int RELAIS6 = 25; //Arduino Pin 32
+const int RELAIS5 = 30; //Arduino Pin 30
+const int RELAIS6 = 32; //Arduino Pin 32
 byte relaisPins[RELAIS_COUNT] = { RELAIS1, RELAIS2, RELAIS3, RELAIS4 , RELAIS5 , RELAIS6 };//Definition der Pins für die Relais
 void relais(int x, int dauer);
+
+
+
+//------------- IR Sensoren -----------
+// Pin 35 Oben, Pin 37 Unten
+#define IR_SENSOR_OBEN   35
+#define IR_SENSOR_UNTEN  37
+
+#define GLAS_GROSS  2 
+#define GLAS_KLEIN  1
+#define GLAS_FEHLER 0
+
+int teste_glas();
+
+
 
 void setup()
 {
@@ -80,7 +95,6 @@ void setup()
   {
     Serial.println(F("MP3-Player erfolgreich initialisiert."));
     myDFPlayer.volume(30);  //Set volume value. From 0 to 30
-    //myDFPlayer.play(2);  //Play Startnachricht
   }
 
   //Initialsierung Schrittmotor
@@ -95,7 +109,17 @@ void setup()
     digitalWrite(relaisPins[x], HIGH);
   }
 
+  //Initialsierung IR Sensoren
+  pinMode(IR_SENSOR_OBEN, INPUT);
+  pinMode(IR_SENSOR_UNTEN, INPUT);
+
+
 }
+
+int phase = 0;
+
+
+void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit);
 
 void loop()
 {
@@ -103,53 +127,229 @@ void loop()
 
   Taste = Tastenfeld.getKey(); //pressedKey entspricht der gedrückten Taste
   if (Taste) { //Wenn eine Taste gedrückt wurde
+
+    //Ausgabe welche Taste gedrückt wurde
     Serial.print("Die Taste ");
     Serial.print(Taste);
     Serial.print(" wurde gedrueckt");
-    Serial.println(); //Teile uns am Serial Monitor die gedrückte Taste mit
+    Serial.println(); 
 
-    if(Taste == '0')
+    if(Taste == '#')
     {
-      //Test-MP3-Player
-      Serial.println(F("Teste MP3-Player."));
-      myDFPlayer.play(1);  //Play MP3 1
+      Serial.println(F("Reset, Springe zu Phase 1."));
+      phase = 0;
     }
     
     if(Taste == '*')
     {
-      //Test-Schrittmotor
-      Serial.println(F("Teste Schrittmotor."));
-      motor(LOW,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
-      delay (1000); 
-      motor(HIGH,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
-      delay (1000); 
+       Serial.println(F("Testphase."));
+       phase = 99;
     }
-    
-    if(Taste == '#')
+
+  }
+
+  
+    switch(phase)
     {
-      //Test-Relais
-      Serial.println(F("Teste Relais."));
-      for (int x = 0; x <RELAIS_COUNT; x++)
-      {
-        relais(x,1000);
-      }
+      case 0:
+        //Begrüßung
+        myDFPlayer.play(11);  //Begruessung
+        Serial.println(F("Schnapsmaschine bereit. Bitte Taste druecken!"));
+
+        /* FALLTHROUGH */
+      case 1: //betriebsphase
+        if(Taste == '1')
+        {
+          erstelle_getraenk(GLAS_KLEIN,3 /* position */,2,1500);
+          
+
+        }
+        break;
+      case 99:
+        //Testphase
+        if(Taste == '1')
+        {
+          //Test-MP3-Player
+          Serial.println(F("Teste MP3-Player."));
+          myDFPlayer.play(2);  //Play MP3 2
+        }
+        if(Taste == '2')
+        {
+           //Test-Schrittmotor
+           Serial.println(F("Teste Schrittmotor nach links."));
+           motor(LOW,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+        }
+        if(Taste == '3')
+        {
+           //Test-Schrittmotor
+           Serial.println(F("Teste Schrittmotor nach rechts."));
+           motor(HIGH,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+        }
+        if(Taste == '4')
+        {
+          //Test-Relais
+          Serial.println(F("Teste Relais."));
+          for (int x = 0; x <RELAIS_COUNT; x++)
+          {
+            relais(x,1500);
+          }
+        }
+        if(Taste == '5')
+        {
+            switch(teste_glas())
+            {
+              case GLAS_KLEIN:
+                 myDFPlayer.play(20);  //Play MP3
+                 break;
+              case GLAS_GROSS:
+                 myDFPlayer.play(21);  //Play MP3
+                 break;
+               default:
+                 myDFPlayer.play(22);  //Play MP3
+                 break;
+            }
+        }
+        break;
     }
-   
 
   
-  }
 
- 
-  if (millis() - timer > 3000) {
-    timer = millis();
-    Serial.println(F("Schnapsmaschine bereit. Bitte Taste druecken!"));
-  }
-  
-  
+    
+      
   //Beobachtung
   if (myDFPlayer.available()) {
     printDetail(myDFPlayer.readType(), myDFPlayer.read()); //Print the detail message from DFPlayer to handle different errors and states.
   }
+}
+
+//                0 <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 
+int schritte[6] = { 1170, 1170, 1170, 1170, 1170 };
+
+int fahre_zu_position(int aktuell,int ziel)
+{
+    
+   Serial.println(F("Reset, Springe zu Phase 1."));
+
+   while(aktuell != ziel)
+   {
+      if(aktuell < ziel)
+      {
+         //nach rechts fahren z.B. von 2 (Mitte) nach 3 (rechts)
+          Serial.println(F("Schrittmotor nach rechts."));
+          if(aktuell >= 5) //Position 5 - Endposition
+          {
+             Serial.println(F("Nach rechts nicht mehr möglich"));
+             return -1;
+          }
+          motor(LOW,schritte[aktuell]); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+          aktuell = aktuell + 1;
+
+      }
+      else {
+        //nach links fahren von 2 nach 1
+        Serial.println(F("Schrittmotor nach links."));
+        if(aktuell <= 0) //position 0 - Endposition
+        {
+           Serial.println(F("Nach links nicht mehr möglich"));
+           return -1;
+        }
+        motor(LOW,schritte[aktuell-1]); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+        aktuell = aktuell - 1;
+      }
+      
+    
+   }
+
+
+   return ziel;
+  
+}
+
+
+//----- Getraenk zubereiten
+void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
+{
+    /*
+     * Glas prüfen
+     * 
+     */
+    int glas_erkannt = teste_glas();
+    if(glas != glas_erkannt)
+    {
+        if(glas_erkannt == GLAS_FEHLER)
+        {
+           if(glas == GLAS_GROSS)
+           {
+              myDFPlayer.play(23);  //Play MP3
+           }
+           else //Schnapsglas
+           {
+              myDFPlayer.play(24);  //Play MP3
+           }
+        }
+        else
+        {
+           if(glas == GLAS_GROSS)
+           {
+              myDFPlayer.play(25);  //Play MP3
+           }
+           else //Schnapsglas
+           {
+              myDFPlayer.play(26);  //Play MP3
+           }
+        }
+        return;      
+    }
+    
+  
+
+    /*
+     * Position anfahren
+     */
+     int start = 2; //(Mitte)
+    int aktuell = fahre_zu_position(start,ziel);
+    if(aktuell < 0)
+    {
+       myDFPlayer.play(30);  //Play MP3
+       return;
+    }
+
+    /*
+     * füllen
+     */
+      relais(relaisnr,fuellzeit);
+
+
+     /*
+      * eventuell. 2 Füllstation
+      */
+      /*
+      * zu Start fahren
+      */
+    
+    aktuell = fahre_zu_position(aktuell,start);
+
+  
+}
+
+
+
+
+//---- IR sensoren -----
+int teste_glas()
+{
+  boolean oben = digitalRead(IR_SENSOR_OBEN);
+  boolean unten = digitalRead(IR_SENSOR_UNTEN);
+
+  if(oben == LOW && unten == LOW)
+  {
+     return GLAS_GROSS;
+  }
+  if(oben == HIGH && unten == LOW)
+  {
+     return GLAS_KLEIN;
+  }
+  return GLAS_FEHLER;
 }
 
 

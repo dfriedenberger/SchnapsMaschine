@@ -1,0 +1,12 @@
+0010 Die Schnapsmaschine wurde erfolgreich gestartet.
+0011 Hallo! Bitte wähle ein Getränk.
+0012 Eine ausgezeichnete Wahl. Ich beginne jetzt mit dem Zubereiten.
+0013 Deine Getränk ist fertig. Prost!
+0020 Du hast ein kleines Glas hingestellt. Du willst wohl einen Schnaps?
+0021 Du hast ein großes Glas hingestellt. Du willst wohl ein Mixgetränk?
+0022 Es steht kein Glas da.
+0023 Du hast kein Glas hingestellt. Bitte stelle ein großes Glas hin.
+0024 Du hast kein Glas hingestellt. Bitte stelle ein Schnapsglas hin.
+0025 Du hast ein kleines Glas hingestellt. Bitte stelle ein großes Glas hin.
+0026 Du hast ein großes Glas hingestellt. Bitte stelle ein kleines Glas hin.
+0030 Es ist ein Fehler aufgetreten. Abbruch.
