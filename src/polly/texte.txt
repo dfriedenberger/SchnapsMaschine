@@ -10,3 +10,15 @@
 0010 Du hast ein kleines Glas hingestellt. Bitte stelle ein großes Glas hin.
 0011 Du hast ein großes Glas hingestellt. Bitte stelle ein kleines Glas hin.
 0012 Es ist ein Fehler aufgetreten. Abbruch.
+0013 Test. Test. Test. 
+0014 Hallo ist da jemand?
+0015 :ES ¿Alguien quiere beber algo?
+0016 Mir ist sooooooo langweilig.
+0017 Für einen Moment schließe ich meine Augen.
+0018 Drücke eine Taste! Du wirst überrascht sein was passiert.
+0019 Ich denke niemals an die Zukunft. Sie kommt früh genug.
+0020 Wer schwankt hat mehr vom Weg!
+0021 Realität ist was für Menschen, die Angst vor Einhörnern haben.
+0022 Egal wie Fisch du bist, Helene ist Fischer.
+0023 Ich spreche drei Sprachen: ironisch, sarkastisch und zweideutig.
+0024 Ich bin nicht faul, ich bin im Energiesparmodus!

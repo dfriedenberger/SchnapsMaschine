@@ -29,6 +29,23 @@ SoftwareSerial mySoftwareSerial(6, 7); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 void printDetail(uint8_t type, int value);
 
+
+
+#define INIT 1 //Die Schnapsmaschine wurde erfolgreich gestartet.
+#define BEREIT 2 //Hallo! Bitte wähle ein Getränk.
+#define GETRAENK_START 3 //Eine ausgezeichnete Wahl. Ich beginne jetzt mit dem Zubereiten.
+#define GETRAENK_FERIG 4 //Dein Getränk ist fertig. Prost!
+#define TEST_GLAS_KLEIN 5 // Du hast ein kleines Glas hingestellt. Du willst wohl einen Schnaps? 
+#define TEST_GLAS_GROSS 6 // Du hast ein großes Glas hingestellt. Du willst wohl ein Mixgetränk? 
+#define TEST_KEIN_GLAS 7 // Es steht kein Glas da. 
+#define GLAS_KEIN_GROSS 8  //Du hast kein Glas hingestellt. Bitte stelle ein großes Glas hin. 
+#define GLAS_KEIN_KLEIN 9 //Du hast kein Glas hingestellt. Bitte stelle ein Schnapsglas hin.
+#define GLAS_KLEIN_GROSS 10 //Du hast ein kleines Glas hingestellt. Bitte stelle ein großes Glas hin.
+#define GLAS_GROSS_KLEIN 11 //Du hast ein großes Glas hingestellt. Bitte stelle ein kleines Glas hin.
+#define FEHLER 12 //Es ist ein Fehler aufgetreten. Abbruch.
+#define TEST_AUSGABE 13 // test test test
+#define JOKE_FIRST        14
+#define JOKE_LAST         24
 //-------------- Tastenfeld --------------
 //Groesse des Keypads 
 const byte COLS = 3; //3 Spalten
@@ -116,6 +133,10 @@ void setup()
 
 }
 
+
+//-----------  Commands
+void command();
+
 int phase = 0;
 
 
@@ -123,15 +144,21 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit);
 
 void loop()
 {
-  static unsigned long timer = millis();
+  static unsigned long lastkey = millis();
+
+  command();
 
   Taste = Tastenfeld.getKey(); //pressedKey entspricht der gedrückten Taste
+
+
+ 
   if (Taste) { //Wenn eine Taste gedrückt wurde
+    lastkey = millis();
 
     //Ausgabe welche Taste gedrückt wurde
-    Serial.print("Die Taste ");
+    Serial.print(F("Die Taste "));
     Serial.print(Taste);
-    Serial.print(" wurde gedrueckt");
+    Serial.print(F(" wurde gedrueckt"));
     Serial.println(); 
 
     if(Taste == '#')
@@ -145,26 +172,52 @@ void loop()
        Serial.println(F("Testphase."));
        phase = 99;
     }
-
   }
 
   
     switch(phase)
     {
       case 0:
-        //Begrüßung
-        myDFPlayer.play(11);  //Begruessung
+        //Begruessung
+        myDFPlayer.play(BEREIT);  //Begruessung
         Serial.println(F("Schnapsmaschine bereit. Bitte Taste druecken!"));
-
         /* FALLTHROUGH */
         phase = 1;
       case 1: //betriebsphase
         if(Taste == '1')
         {
-          erstelle_getraenk(GLAS_KLEIN,3 /* position */,2,1500);
-          
-
+          erstelle_getraenk(GLAS_KLEIN,1 /* position */,RELAIS1 /* Relais */,1500);
         }
+        if(Taste == '2')
+        {
+          erstelle_getraenk(GLAS_KLEIN,2 /* position */,RELAIS2 /* Relais */,1500);
+        }
+        if(Taste == '3')
+        {
+          erstelle_getraenk(GLAS_KLEIN,3 /* position */,RELAIS3 /* Relais */,1500);
+        }
+        if(Taste == '4')
+        {
+          erstelle_getraenk(GLAS_KLEIN,4 /* position */,RELAIS4 /* Relais */,1500);
+        }
+        if(Taste == '5')
+        {
+          erstelle_getraenk(GLAS_KLEIN,5 /* position */,RELAIS5 /* Relais */,1500);
+        }
+        if(Taste == '6')
+        {
+          erstelle_getraenk(GLAS_KLEIN,5 /* position */,RELAIS6 /* Relais */,1500);
+        }
+        
+        if((millis() - lastkey) > 60000)
+        {
+          int song = random(JOKE_FIRST , JOKE_LAST + 1);
+          Serial.println(F("Timeout einige Minuten gewartet"));
+          myDFPlayer.play(song);
+          //simulate key press
+          lastkey = millis();
+        }
+       
         break;
       case 99:
         //Testphase
@@ -172,8 +225,9 @@ void loop()
         {
           //Test-MP3-Player
           Serial.println(F("Teste MP3-Player."));
-          myDFPlayer.play(2);  //Play MP3 2
+          myDFPlayer.play(TEST_AUSGABE);  //Play MP3
         }
+        
         if(Taste == '2')
         {
            //Test-Schrittmotor
@@ -184,15 +238,17 @@ void loop()
         {
            //Test-Schrittmotor
            Serial.println(F("Teste Schrittmotor nach rechts."));
-           motor(HIGH,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+           motor(HIGH,1170); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
         }
+
         if(Taste == '4')
         {
           //Test-Relais
           Serial.println(F("Teste Relais."));
           for (int x = 0; x <RELAIS_COUNT; x++)
           {
-            relais(x,1500);
+            int pin = relaisPins[x];
+            relais(pin,1500);
           }
         }
         if(Taste == '5')
@@ -200,13 +256,13 @@ void loop()
             switch(teste_glas())
             {
               case GLAS_KLEIN:
-                 myDFPlayer.play(20);  //Play MP3
+                 myDFPlayer.play(TEST_GLAS_KLEIN);  //Play MP3
                  break;
               case GLAS_GROSS:
-                 myDFPlayer.play(21);  //Play MP3
+                 myDFPlayer.play(TEST_GLAS_GROSS);  //Play MP3
                  break;
                default:
-                 myDFPlayer.play(22);  //Play MP3
+                 myDFPlayer.play(TEST_KEIN_GLAS);  //Play MP3
                  break;
             }
         }
@@ -221,19 +277,67 @@ void loop()
   if (myDFPlayer.available()) {
     printDetail(myDFPlayer.readType(), myDFPlayer.read()); //Print the detail message from DFPlayer to handle different errors and states.
   }
+  
 }
 
+//-----------  Commands
+String inData = "";
+void command() {
+   if (Serial.available() > 0)
+    {
+      
+        char recieved = Serial.read();
+        inData += recieved; 
+ 
+        // Process message when new line character is recieved
+        if (recieved == '\n')
+        {
+            Serial.print("Arduino Received: ");
+            Serial.print(inData);
+ 
+            inData.trim();
+            inData.toLowerCase();
+            if(inData == "ping"){ 
+              Serial.println("pong");
+            }
+
+            if(inData.startsWith("play ")) { 
+              int song = inData.substring(5).toInt();
+              Serial.print("play song ");
+              Serial.println(song);
+              myDFPlayer.play(song);  //Play the first mp3
+            }
+            inData = ""; // Clear recieved buffer
+        }
+    }
+}
+
+
 //  5 , 4 , 3 , 2 , 1
-//                0 <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 
-int schritte[6] = { 1170, 1170, 1170, 1170, 1170 };
+//                1 <-> 2 <-> 3 <-> 4 <-> 5 
+int schritte[5] = { 1170, 1170, 1170, 1170 };
 
 int fahre_zu_position(int aktuell,int ziel)
 {
     
-   Serial.println(F("Reset, Springe zu Phase 1."));
 
-  
+   if(aktuell < ziel)
+     for(int i = aktuell + 1;i <= ziel;i++)
+     {
+         Serial.print(F("Fahre nach links zur Position "));
+         Serial.println(i);
+         // Pos 1 -> Pos 2 => i = 2 schritte0
+         motor(LOW,schritte[i-2]); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
+     }
 
+   if(aktuell > ziel)
+     for(int i = aktuell - 1;i >= ziel;i--)
+     {
+         Serial.print(F("Fahre nach rechts zur Position "));
+         Serial.println(i);
+         // Pos 2 -> Pos 1 => i = 1 schritte0
+         motor(HIGH,schritte[i-1]); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
+     }
 
    return ziel;
   
@@ -241,7 +345,7 @@ int fahre_zu_position(int aktuell,int ziel)
 
 
 //----- Getraenk zubereiten
-void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
+void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
 {
     /*
      * Glas prüfen
@@ -253,44 +357,43 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
         {
            if(glas == GLAS_GROSS)
            {
-              myDFPlayer.play(23);  //Play MP3
+              myDFPlayer.play(GLAS_KEIN_GROSS);  //Play MP3
            }
            else //Schnapsglas
            {
-              myDFPlayer.play(24);  //Play MP3
+              myDFPlayer.play(GLAS_KEIN_KLEIN);  //Play MP3
            }
         }
         else
         {
            if(glas == GLAS_GROSS)
            {
-              myDFPlayer.play(25);  //Play MP3
+              myDFPlayer.play(GLAS_KLEIN_GROSS);  //Play MP3
            }
            else //Schnapsglas
            {
-              myDFPlayer.play(26);  //Play MP3
+              myDFPlayer.play(GLAS_GROSS_KLEIN);  //Play MP3
            }
         }
         return;      
     }
     
   
-    myDFPlayer.play(12);  //Play MP3
+    myDFPlayer.play(GETRAENK_START);  //Play MP3
     /*
      * Position anfahren
      */
-     int start = 2; //(Mitte)
-    int aktuell = fahre_zu_position(start,ziel);
+    int aktuell = fahre_zu_position(3 /* start */,ziel);
     if(aktuell < 0)
     {
-       myDFPlayer.play(30);  //Play MP3
+       myDFPlayer.play(FEHLER);  //Play MP3
        return;
     }
 
     /*
      * füllen
      */
-      relais(relaisnr,fuellzeit);
+     relais(relaispin,fuellzeit);
 
 
      /*
@@ -300,14 +403,15 @@ void erstelle_getraenk(int glas,int ziel,int relaisnr,int fuellzeit)
       * zu Start fahren
       */
     
-    aktuell = fahre_zu_position(aktuell,start);
+    aktuell = fahre_zu_position(aktuell,3 /* start */);
     if(aktuell < 0)
     {
-       myDFPlayer.play(30);  //Play MP3
+       myDFPlayer.play(FEHLER);  //Play MP3
        return;
     }
-     
-    myDFPlayer.play(13);  //Play MP3
+
+    //fertig
+    myDFPlayer.play(GETRAENK_FERIG);  //Play MP3
 
 }
 
@@ -337,7 +441,7 @@ void motor(int richtung, int steps)
 {
 
   digitalWrite (dir, richtung); // richtung LOW = vorwaerts/links , HIGH = rueckwaerts/rechts
-  for (int x = 0; x <steps; x ++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
+  for (int x = 0; x <steps; x++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
     delayMicroseconds(1500); // WARTEN
@@ -347,11 +451,11 @@ void motor(int richtung, int steps)
 }
 
 //Relais schalten
-void relais(int x, int dauer)
+void relais(int pin, int dauer)
 {
-    digitalWrite(relaisPins[x], LOW); //Einschalten
+    digitalWrite(pin, LOW); //Einschalten
     delay(dauer); //WARTEN
-    digitalWrite(relaisPins[x], HIGH);//Ausschalten
+    digitalWrite(pin, HIGH);//Ausschalten
 
 }
 
