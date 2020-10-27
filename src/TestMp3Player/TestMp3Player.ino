@@ -28,6 +28,8 @@ SoftwareSerial mySoftwareSerial(6, 7); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 void printDetail(uint8_t type, int value);
 
+String inData = "";
+
 void setup()
 {
   mySoftwareSerial.begin(9600);
@@ -44,24 +46,49 @@ void setup()
     while(true){
       delay(0); // Code to compatible with ESP8266 watch dog.
     }
+    
   }
   Serial.println(F("DFPlayer Mini online."));
   
   myDFPlayer.volume(30);  //Set volume value. From 0 to 30
-  myDFPlayer.play(2);  //Play the first mp3
+  
+
 }
 
 void loop()
 {
-  static unsigned long timer = millis();
-  
-  /*
-   
-   if (millis() - timer > 30000) {
-    timer = millis();
-    myDFPlayer.next();  //Play next mp3 every 3 second.
-  }
-  */
+
+    while (Serial.available() > 0)
+    {
+      
+        char recieved = Serial.read();
+        inData += recieved; 
+ 
+        // Process message when new line character is recieved
+        if (recieved == '\n')
+        {
+            Serial.print("Arduino Received: ");
+            Serial.print(inData);
+         
+ 
+            inData.trim();
+            inData.toLowerCase();
+            if(inData == "ping"){ 
+              Serial.println("pong");
+            }
+
+            if(inData.startsWith("play ")) { 
+              int song = inData.substring(5).toInt();
+              Serial.print("play song ");
+              Serial.println(song);
+              myDFPlayer.play(song);  //Play the first mp3
+            }
+ 
+            inData = ""; // Clear recieved buffer
+        }
+    }
+
+ 
   
   if (myDFPlayer.available()) {
     printDetail(myDFPlayer.readType(), myDFPlayer.read()); //Print the detail message from DFPlayer to handle different errors and states.
@@ -97,7 +124,7 @@ void printDetail(uint8_t type, int value){
       Serial.print(value);
       Serial.println(F(" Play Finished!"));
 
-      myDFPlayer.next();
+      //myDFPlayer.next();
       
       break;
     case DFPlayerError:

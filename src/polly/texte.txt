@@ -1,7 +1,7 @@
 0001 Die Schnapsmaschine wurde erfolgreich gestartet.
 0002 Hallo! Bitte wähle ein Getränk.
 0003 Eine ausgezeichnete Wahl. Ich beginne jetzt mit dem Zubereiten.
-0004 Deine Getränk ist fertig. Prost!
+0004 Dein Getränk ist fertig. Prost!
 0005 Du hast ein kleines Glas hingestellt. Du willst wohl einen Schnaps?
 0006 Du hast ein großes Glas hingestellt. Du willst wohl ein Mixgetränk?
 0007 Es steht kein Glas da.
