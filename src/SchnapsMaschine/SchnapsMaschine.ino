@@ -186,7 +186,7 @@ void loop()
       case 1: //betriebsphase
         if(Taste == '1')
         {
-          erstelle_getraenk(GLAS_GROSS,1 /* position */,RELAIS1 /* Relais */,2000);
+          erstelle_getraenk(GLAS_KLEIN,1 /* position */,RELAIS1 /* Relais */,2000);
         }
         if(Taste == '2')
         {
