@@ -186,27 +186,27 @@ void loop()
       case 1: //betriebsphase
         if(Taste == '1')
         {
-          erstelle_getraenk(GLAS_KLEIN,1 /* position */,RELAIS1 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,1 /* position */,RELAIS1 /* Relais */,2000);
         }
         if(Taste == '2')
         {
-          erstelle_getraenk(GLAS_KLEIN,2 /* position */,RELAIS2 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,2 /* position */,RELAIS2 /* Relais */,2000);
         }
         if(Taste == '3')
         {
-          erstelle_getraenk(GLAS_KLEIN,3 /* position */,RELAIS3 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,3 /* position */,RELAIS3 /* Relais */,2000);
         }
         if(Taste == '4')
         {
-          erstelle_getraenk(GLAS_KLEIN,4 /* position */,RELAIS4 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,4 /* position */,RELAIS4 /* Relais */,2000);
         }
         if(Taste == '5')
         {
-          erstelle_getraenk(GLAS_KLEIN,5 /* position */,RELAIS5 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,5 /* position */,RELAIS5 /* Relais */,2000);
         }
         if(Taste == '6')
         {
-          erstelle_getraenk(GLAS_KLEIN,5 /* position */,RELAIS6 /* Relais */,1500);
+          erstelle_getraenk(GLAS_GROSS,6 /* position */,RELAIS6 /* Relais */,3000);
         }
         
         if((millis() - lastkey) > 60000)
@@ -314,8 +314,8 @@ void command() {
 
 
 //  5 , 4 , 3 , 2 , 1
-//                1 <-> 2 <-> 3 <-> 4 <-> 5 
-int schritte[5] = { 1170, 1170, 1170, 1170 };
+//                1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 6
+int schritte[6] = { 770 , 1170, 1170, 770 , 80 };
 
 int fahre_zu_position(int aktuell,int ziel)
 {

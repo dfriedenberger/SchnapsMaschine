@@ -9,8 +9,8 @@ char hexaKeys[ROWS][COLS]={
 {'6','5','4'},
 {'3','2','1'}
 };
-byte colPins[COLS] = { 34, 36, 38 }; //Definition der Pins für die 3 Spalten
-byte rowPins[ROWS] = { 40, 42, 44, 46 };//Definition der Pins für die 4 Zeilen
+byte colPins[COLS] = { 38, 40, 42 }; //Definition der Pins für die 3 Spalten
+byte rowPins[ROWS] = { 44, 46, 48, 50 };//Definition der Pins für die 4 Zeilen
 char Taste; //pressedKey entspricht in Zukunft den gedrückten Tasten
 Keypad Tastenfeld = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); //Das Keypad kann absofort mit myKeypad angesprochen werden
 void setup() {
