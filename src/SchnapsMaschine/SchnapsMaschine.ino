@@ -64,7 +64,8 @@ char Taste = 0; //pressedKey entspricht in Zukunft den gedrückten Tasten
 Keypad Tastenfeld = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 //-------------- Schrittmotor --------------
-const int dir = 9; // RICHTUNGSPIN
+const int aktiv = 10; //SLEEP PIN
+const int dir = 9; // RICHTUNGS PIN
 const int Step = 8; // SCHRITT PIN
 void motor(int richtung, int steps);
 
@@ -84,8 +85,8 @@ void relais(int x, int dauer);
 
 //------------- IR Sensoren -----------
 // Pin 35 Oben, Pin 37 Unten
-#define IR_SENSOR_OBEN   35
-#define IR_SENSOR_UNTEN  37
+#define IR_SENSOR_OBEN   11
+#define IR_SENSOR_UNTEN  35
 
 #define GLAS_GROSS  2 
 #define GLAS_KLEIN  1
@@ -107,8 +108,7 @@ void setup()
   if (!myDFPlayer.begin(mySoftwareSerial)) 
   {  
     Serial.println(F("MP3-Player nicht gefunden. Bitte pruefen."));
-  }
-  else
+  }  
   {
     Serial.println(F("MP3-Player erfolgreich initialisiert."));
     myDFPlayer.volume(30);  //Set volume value. From 0 to 30
@@ -117,6 +117,9 @@ void setup()
   //Initialsierung Schrittmotor
   pinMode (dir, OUTPUT); // RICHTUNG ALS AUSGABE
   pinMode (Step, OUTPUT); // SCHRITT ALS AUSGANG
+  //pinMode (aktiv, OUTPUT); // SLEEP
+
+  //digitalWrite (aktiv, HIGH); // Motor aus
 
   //Initialsierung Relais
   for (int x = 0; x <RELAIS_COUNT; x++)
@@ -131,6 +134,11 @@ void setup()
   pinMode(IR_SENSOR_UNTEN, INPUT);
 
 
+  // if analog input pin 0 is unconnected, random analog
+  // noise will cause the call to randomSeed() to generate
+  // different seed numbers each time the sketch runs.
+  // randomSeed() will then shuffle the random function.
+  randomSeed(analogRead(0));
 }
 
 
@@ -186,27 +194,27 @@ void loop()
       case 1: //betriebsphase
         if(Taste == '1')
         {
-          erstelle_getraenk(GLAS_KLEIN,1 /* position */,RELAIS1 /* Relais */,2000);
+          erstelle_getraenk(GLAS_GROSS,1 /* position */,RELAIS1 /* Relais */,1600);
         }
         if(Taste == '2')
         {
-          erstelle_getraenk(GLAS_GROSS,2 /* position */,RELAIS2 /* Relais */,2000);
+          erstelle_getraenk(GLAS_GROSS,2 /* position */,RELAIS2 /* Relais */,1600);
         }
         if(Taste == '3')
         {
-          erstelle_getraenk(GLAS_GROSS,3 /* position */,RELAIS3 /* Relais */,2000);
+          erstelle_getraenk(GLAS_GROSS,3 /* position */,RELAIS3 /* Relais */,1600);
         }
         if(Taste == '4')
         {
-          erstelle_getraenk(GLAS_GROSS,4 /* position */,RELAIS4 /* Relais */,2000);
+          erstelle_getraenk(GLAS_GROSS,4 /* position */,RELAIS4 /* Relais */,1600);
         }
         if(Taste == '5')
         {
-          erstelle_getraenk(GLAS_GROSS,5 /* position */,RELAIS5 /* Relais */,2000);
+          erstelle_getraenk(GLAS_GROSS,5 /* position */,RELAIS5 /* Relais */,1600);
         }
         if(Taste == '6')
         {
-          erstelle_getraenk(GLAS_GROSS,6 /* position */,RELAIS6 /* Relais */,3000);
+          erstelle_getraenk(GLAS_GROSS,6 /* position */,RELAIS6 /* Relais */,1600);
         }
         
         if((millis() - lastkey) > 60000)
@@ -232,13 +240,13 @@ void loop()
         {
            //Test-Schrittmotor
            Serial.println(F("Teste Schrittmotor nach links."));
-           motor(LOW,1170); //1170 viertelUmderhung,2340 Halbe Umdrehung 
+           motor(LOW,1600); //1600 viertelUmderhung,3200 Halbe Umdrehung 
         }
         if(Taste == '3')
         {
            //Test-Schrittmotor
            Serial.println(F("Teste Schrittmotor nach rechts."));
-           motor(HIGH,1170); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
+           motor(HIGH,1600); //1600 viertelUmdrehung, 3200 halbe Umdrehung 
         }
 
         if(Taste == '4')
@@ -315,11 +323,13 @@ void command() {
 
 //  5 , 4 , 3 , 2 , 1
 //                1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 6
-int schritte[6] = { 770 , 1170, 1170, 770 , 80 };
+int schritte[6] = { 1600 , 2500, 2400, 1300 , 400 };
 
 int fahre_zu_position(int aktuell,int ziel)
 {
-    
+  
+   
+
 
    if(aktuell < ziel)
      for(int i = aktuell + 1;i <= ziel;i++)
@@ -327,7 +337,7 @@ int fahre_zu_position(int aktuell,int ziel)
          Serial.print(F("Fahre nach links zur Position "));
          Serial.println(i);
          // Pos 1 -> Pos 2 => i = 2 schritte0
-         motor(LOW,schritte[i-2]); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
+         motor(LOW,schritte[i-2]); //1600 viertelUmdrehung, 3200 halbe Umdrehung 
      }
 
    if(aktuell > ziel)
@@ -336,9 +346,10 @@ int fahre_zu_position(int aktuell,int ziel)
          Serial.print(F("Fahre nach rechts zur Position "));
          Serial.println(i);
          // Pos 2 -> Pos 1 => i = 1 schritte0
-         motor(HIGH,schritte[i-1]); //1170 viertelUmdrehung, 2340 halbe Umdrehung 
+         motor(HIGH,schritte[i-1]); //1600 viertelUmdrehung, 3200 halbe Umdrehung 
      }
 
+ 
    return ziel;
   
 }
@@ -380,6 +391,10 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
     
   
     myDFPlayer.play(GETRAENK_START);  //Play MP3
+
+    //digitalWrite (aktiv, LOW); // Motor ein
+    delay(300);
+
     /*
      * Position anfahren
      */
@@ -390,11 +405,15 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
        return;
     }
 
+
+     delay(1000);
     /*
      * füllen
      */
      relais(relaispin,fuellzeit);
 
+     delay(1000);
+     
 
      /*
       * eventuell. 2 Füllstation
@@ -410,8 +429,12 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
        return;
     }
 
+
     //fertig
     myDFPlayer.play(GETRAENK_FERIG);  //Play MP3
+
+   delay(1000);
+   //digitalWrite (aktiv, HIGH); // Motor aus
 
 }
 
@@ -436,18 +459,22 @@ int teste_glas()
 }
 
 
+
+
 //Schrittmotor bewegen
 void motor(int richtung, int steps)
 {
 
   digitalWrite (dir, richtung); // richtung LOW = vorwaerts/links , HIGH = rueckwaerts/rechts
-  for (int x = 0; x <steps; x++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
+  for (int x = 0; x <steps; x++) // 1600 viertelUmderhung,3200 Halbe Umdrehung 
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
-    delayMicroseconds(1500); // WARTEN
+    delayMicroseconds(950); // WARTEN
     digitalWrite (Step, LOW); // SCHRITT NIEDRIG
-    delayMicroseconds(1500); // WARTEN
+    delayMicroseconds(950); // WARTEN
   }
+  
+
 }
 
 //Relais schalten

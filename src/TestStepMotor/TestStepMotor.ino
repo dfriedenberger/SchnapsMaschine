@@ -15,21 +15,21 @@ void setup ()
 void loop () 
 {
   digitalWrite (dir, LOW); // RICHTUNG FÜR VORWÄRTSDREHUNG NIEDRIG EINSTELLEN
-  for (int x = 0; x <1170; x ++) // 1170 viertelUmderhung,2340 Halbe Umdrehung 
+  for (int x = 0; x <1600; x ++) // 1600 viertelUmderhung,3200 Halbe Umdrehung 
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
-    delayMicroseconds(1500); // WARTEN
+    delayMicroseconds(950); // WARTEN
     digitalWrite (Step, LOW); // SCHRITT NIEDRIG
-    delayMicroseconds(1500); // WARTEN
+    delayMicroseconds(950); // WARTEN
   }
   delay (1000); // VERZÖGERUNG VOR DER SCHALTERRICHTUNG
   digitalWrite (dir, HIGH); // RICHTUNG FÜR RÜCKWÄRTSDREHUNG HOCH STELLEN
-  for (int x = 0; x <1170; x ++) // 1170 viertelUmderhung,2340 Halbe Umdrehung
+  for (int x = 0; x <1600; x ++) // 1600 viertelUmderhung,3200 Halbe Umdrehung
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
-    delayMicroseconds(1500);; // WARTEN
+    delayMicroseconds(950);; // WARTEN
     digitalWrite (Step, LOW); // SCHRITT NIEDRIG
-    delayMicroseconds(1500);; // WARTEN
+    delayMicroseconds(950);; // WARTEN
   }
   delay (3000); // VERZÖGERUNG VOR DER SCHALTERRICHTUNG
 }
