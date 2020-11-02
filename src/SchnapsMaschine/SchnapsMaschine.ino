@@ -52,6 +52,9 @@ void printDetail(uint8_t type, int value);
 #define SPUELPROGRAMM     27 // Spülprogramm
 
 
+boolean playsong = false;
+void warteaufsongende();
+
 //-------------- Tastenfeld --------------
 //Groesse des Keypads 
 const byte COLS = 3; //3 Spalten
@@ -438,6 +441,7 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
     
   
     myDFPlayer.play(GETRAENK_START);  //Play MP3
+    playsong = true; //Marker setzen, dass Song gestartet wird
 
     //digitalWrite (aktiv, LOW); // Motor ein
     delay(300);
@@ -454,6 +458,10 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
 
 
      delay(1000);
+
+
+     warteaufsongende();
+
     /*
      * füllen
      */
@@ -534,6 +542,17 @@ void relais(int pin, int dauer)
 }
 
 
+
+void warteaufsongende()
+{
+  for(int i = 0;i< 20;i++)
+  {
+    if(!playsong) break;
+    delay(100); 
+  }
+  
+}
+
 void printDetail(uint8_t type, int value){
   switch (type) {
     case TimeOut:
@@ -561,6 +580,7 @@ void printDetail(uint8_t type, int value){
       Serial.print(F("Number:"));
       Serial.print(value);
       Serial.println(F(" Play Finished!"));
+      playsong = false;
       break;
     case DFPlayerError:
       Serial.print(F("DFPlayerError:"));
