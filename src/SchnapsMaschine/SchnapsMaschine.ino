@@ -111,7 +111,7 @@ void setup()
   }  
   {
     Serial.println(F("MP3-Player erfolgreich initialisiert."));
-    myDFPlayer.volume(30);  //Set volume value. From 0 to 30
+    myDFPlayer.volume(28);  //Set volume value. From 0 to 30
   }
 
   //Initialsierung Schrittmotor
@@ -323,7 +323,7 @@ void command() {
 
 //  5 , 4 , 3 , 2 , 1
 //                1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 6
-int schritte[6] = { 1600 , 2500, 2400, 1300 , 400 };
+int schritte[6] = { 1600 , 2600, 2400, 1300 , 400 };
 
 int fahre_zu_position(int aktuell,int ziel)
 {
@@ -393,7 +393,7 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
     myDFPlayer.play(GETRAENK_START);  //Play MP3
 
     //digitalWrite (aktiv, LOW); // Motor ein
-    delay(300);
+    
 
     /*
      * Position anfahren
@@ -469,12 +469,12 @@ void motor(int richtung, int steps)
   for (int x = 0; x <steps; x++) // 1600 viertelUmderhung,3200 Halbe Umdrehung 
   {
     digitalWrite (Step, HIGH); // SCHRITT HOCH
-    delayMicroseconds(950); // WARTEN
+    delayMicroseconds(600); // WARTEN
     digitalWrite (Step, LOW); // SCHRITT NIEDRIG
-    delayMicroseconds(950); // WARTEN
+    delayMicroseconds(600); // WARTEN
   }
   
-
+   //delay(100);
 }
 
 //Relais schalten
