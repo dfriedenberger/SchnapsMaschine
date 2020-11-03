@@ -186,7 +186,7 @@ void loop()
     
     if(Taste == '*')
     {
-       Serial.println(F("Testphase."));
+       Serial.println(F("Waehle Programm."));
        myDFPlayer.play(PROGRAMMMENUE);  
        phase = 2;
     }
@@ -248,6 +248,7 @@ void loop()
         {
           //Testprogramm
           phase = 99;
+          Serial.println(F("Testprogramm"));
           myDFPlayer.play(TESTPROGRAMM);  
           break;
         }
@@ -255,27 +256,20 @@ void loop()
         {
           //Spülprogramm
           phase = 98;
+          Serial.println(F("Spuelprogramm"));
           myDFPlayer.play(SPUELPROGRAMM);  
           break;
         }
         break;
       case 98: 
-        if(Taste == '1') digitalWrite(RELAIS1, LOW); //Einschalten
-        if(Taste == '2') digitalWrite(RELAIS2, LOW); //Einschalten
-        if(Taste == '3') digitalWrite(RELAIS3, LOW); //Einschalten
-        if(Taste == '4') digitalWrite(RELAIS4, LOW); //Einschalten
-        if(Taste == '5') digitalWrite(RELAIS5, LOW); //Einschalten
-        if(Taste == '6') digitalWrite(RELAIS6, LOW); //Einschalten
+        if(Taste == '1') relais(RELAIS1, 3000); //Einschalten
+        if(Taste == '2') relais(RELAIS2, 3000); //Einschalten
+        if(Taste == '3') relais(RELAIS3, 3000); //Einschalten
+        if(Taste == '4') relais(RELAIS4, 3000); //Einschalten
+        if(Taste == '5') relais(RELAIS5, 3000); //Einschalten
+        if(Taste == '6') relais(RELAIS6, 3000); //Einschalten
 
-        if(!Taste)
-        {
-          //Alle ausschalten
-          for (int x = 0; x <RELAIS_COUNT; x++)
-          {
-            //Defaultzustand = AUS
-            digitalWrite(relaisPins[x], HIGH);
-          }
-        }
+     
         break;
       case 99:
         //Testphase
