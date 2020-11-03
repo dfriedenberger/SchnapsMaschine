@@ -22,3 +22,6 @@
 0022 Egal wie Fisch du bist, Helene ist Fischer.
 0023 Ich spreche drei Sprachen: ironisch, sarkastisch und zweideutig.
 0024 Ich bin nicht faul, ich bin im Energiesparmodus!
+0025 Bitte wähle ein Programm! 0 - Hauptprogramm, 1 - Testprogramm, 2 - Spülprogramm
+0026 Testprogramm
+0027 Spülprogramm

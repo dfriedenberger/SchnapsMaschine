@@ -45,7 +45,16 @@ void printDetail(uint8_t type, int value);
 #define FEHLER 12 //Es ist ein Fehler aufgetreten. Abbruch.
 #define TEST_AUSGABE 13 // test test test
 #define JOKE_FIRST        14
+// ...
 #define JOKE_LAST         24
+#define PROGRAMMMENUE     25 // Bitte wähle ein Programm! 0 - Hauptprogramm, 1 - Testprogramm, 2 - Spülprogramm
+#define TESTPROGRAMM      26 // Testprogramm
+#define SPUELPROGRAMM     27 // Spülprogramm
+
+
+boolean playsong = false;
+void warteaufsongende();
+
 //-------------- Tastenfeld --------------
 //Groesse des Keypads 
 const byte COLS = 3; //3 Spalten
@@ -178,7 +187,8 @@ void loop()
     if(Taste == '*')
     {
        Serial.println(F("Testphase."));
-       phase = 99;
+       myDFPlayer.play(PROGRAMMMENUE);  
+       phase = 2;
     }
   }
 
@@ -226,6 +236,46 @@ void loop()
           lastkey = millis();
         }
        
+        break;
+      case 2:
+        if(Taste == '0')
+        {
+          //Hauptprogramm
+          phase = 0;
+          break;
+        }
+        if(Taste == '1')
+        {
+          //Testprogramm
+          phase = 99;
+          myDFPlayer.play(TESTPROGRAMM);  
+          break;
+        }
+        if(Taste == '2')
+        {
+          //Spülprogramm
+          phase = 98;
+          myDFPlayer.play(SPUELPROGRAMM);  
+          break;
+        }
+        break;
+      case 98: 
+        if(Taste == '1') digitalWrite(RELAIS1, LOW); //Einschalten
+        if(Taste == '2') digitalWrite(RELAIS2, LOW); //Einschalten
+        if(Taste == '3') digitalWrite(RELAIS3, LOW); //Einschalten
+        if(Taste == '4') digitalWrite(RELAIS4, LOW); //Einschalten
+        if(Taste == '5') digitalWrite(RELAIS5, LOW); //Einschalten
+        if(Taste == '6') digitalWrite(RELAIS6, LOW); //Einschalten
+
+        if(!Taste)
+        {
+          //Alle ausschalten
+          for (int x = 0; x <RELAIS_COUNT; x++)
+          {
+            //Defaultzustand = AUS
+            digitalWrite(relaisPins[x], HIGH);
+          }
+        }
         break;
       case 99:
         //Testphase
@@ -391,6 +441,7 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
     
   
     myDFPlayer.play(GETRAENK_START);  //Play MP3
+    playsong = true; //Marker setzen, dass Song gestartet wird
 
     //digitalWrite (aktiv, LOW); // Motor ein
     
@@ -407,6 +458,10 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
 
 
      delay(1000);
+
+
+     warteaufsongende();
+
     /*
      * füllen
      */
@@ -487,6 +542,17 @@ void relais(int pin, int dauer)
 }
 
 
+
+void warteaufsongende()
+{
+  for(int i = 0;i< 20;i++)
+  {
+    if(!playsong) break;
+    delay(100); 
+  }
+  
+}
+
 void printDetail(uint8_t type, int value){
   switch (type) {
     case TimeOut:
@@ -514,6 +580,7 @@ void printDetail(uint8_t type, int value){
       Serial.print(F("Number:"));
       Serial.print(value);
       Serial.println(F(" Play Finished!"));
+      playsong = false;
       break;
     case DFPlayerError:
       Serial.print(F("DFPlayerError:"));
