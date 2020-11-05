@@ -73,7 +73,7 @@ char Taste = 0; //pressedKey entspricht in Zukunft den gedrückten Tasten
 Keypad Tastenfeld = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 //-------------- Schrittmotor --------------
-const int aktiv = 10; //SLEEP PIN
+//const int aktiv = 10; //SLEEP PIN
 const int dir = 9; // RICHTUNGS PIN
 const int Step = 8; // SCHRITT PIN
 void motor(int richtung, int steps);
@@ -366,7 +366,7 @@ void command() {
 
 
 //  5 , 4 , 3 , 2 , 1
-//                1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 6
+//                 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 6
 int schritte[6] = { 1600 , 2600, 2400, 1300 , 400 };
 
 int fahre_zu_position(int aktuell,int ziel)
@@ -449,12 +449,16 @@ void erstelle_getraenk(int glas,int ziel,int relaispin,int fuellzeit)
        myDFPlayer.play(FEHLER);  //Play MP3
        return;
     }
-
+    if(ziel == 3)
+    {
+      //Wenn Position 3
+       delay(1000);
+    }
 
      delay(1000);
 
 
-     warteaufsongende();
+     //warteaufsongende();
 
     /*
      * füllen
